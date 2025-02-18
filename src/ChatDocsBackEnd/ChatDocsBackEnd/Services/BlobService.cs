@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Sas;
 
 namespace ChatDocsBackEnd.Services
 {
@@ -22,6 +23,31 @@ namespace ChatDocsBackEnd.Services
         {
             var blobClient = _blobContainerClient.GetBlobClient(blobName);
             await blobClient.DeleteIfExistsAsync();
+        }
+
+        public string GetBlobSasUri(string blobName, DateTimeOffset expiryTime)
+        {
+            var blobClient = _blobContainerClient.GetBlobClient(blobName);
+
+            if (blobClient.CanGenerateSasUri)
+            {
+                var sasBuilder = new BlobSasBuilder
+                {
+                    BlobContainerName = _blobContainerClient.Name,
+                    BlobName = blobName,
+                    Resource = "b",
+                    ExpiresOn = expiryTime
+                };
+
+                sasBuilder.SetPermissions(BlobSasPermissions.Read);
+
+                Uri sasUri = blobClient.GenerateSasUri(sasBuilder);
+                return sasUri.ToString();
+            }
+            else
+            {
+                throw new InvalidOperationException("BlobClient cannot generate SAS URI. Ensure the client is authorized with Shared Key credentials.");
+            }
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿#pragma warning disable
 namespace ChatDocsBackEnd.Api
 {
+    using Azure.Storage.Blobs;
+    using Azure.Storage.Sas;
     using ChatDocsBackEnd.Data;
     using ChatDocsBackEnd.Services;
     using ChatDocsBackEnd.Utils;
@@ -22,6 +24,7 @@ namespace ChatDocsBackEnd.Api
             app.MapGet("/documents", ListDocumentsAsync);
             app.MapDelete("/documents/{documentId}", DeleteDocumentsAsync);
             app.MapPost("/documents", Upload).DisableAntiforgery();
+            app.MapGet("/documents/pdfSasUri", GetPdfSasUri);
         }
 
         public static async Task<IResult> ListDocumentsAsync([FromServices] ICosmosDbService cosmosDbService)
@@ -150,6 +153,13 @@ namespace ChatDocsBackEnd.Api
             {
                 return string.Empty;
             }
+        }
+
+
+        public static IResult GetPdfSasUri([FromServices] IBlobService blobService, string blobName)
+        {
+            var sasUri = blobService.GetBlobSasUri(blobName, DateTimeOffset.UtcNow.AddHours(1));
+            return Results.Ok(new { sasUri });
         }
     }
 }
