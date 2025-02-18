@@ -6,6 +6,8 @@ ChatDocs is an AI-powered search tool for team documentation, enabling efficient
 
 This application leverages the power of RAG to perform semantic searches across team documentation. It uses OpenAI for generating embeddings and performing semantic searches.
 
+![ChatDocs Demo](ChatDocs.gif)
+
 ## Technologies Used
 
 - **Frontend**: React + Vite
